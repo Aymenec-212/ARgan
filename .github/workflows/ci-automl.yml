@@ -1,0 +1,36 @@
+name: "CI — AutoML (Tier 2)"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/rgan/automl/**"
+      - "src/rgan/resample/**"
+      - "tests/test_automl.py"
+      - "pyproject.toml"
+  pull_request:
+    branches: [main]
+
+jobs:
+  automl:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install core + automl + dev deps
+        run: uv sync --extra dev --extra automl
+
+      - name: Test (pytest)
+        run: uv run pytest tests/test_automl.py -m automl --tb=short -q

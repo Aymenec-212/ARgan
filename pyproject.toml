@@ -1,0 +1,128 @@
+[build-system]
+requires = ["hatchling>=1.21.0"]
+build-backend = "hatchling.build"
+
+# ──────────────────────────────────────────────
+# Project metadata
+# ──────────────────────────────────────────────
+[project]
+name = "rgan"
+version = "0.1.0"
+description = "Regularized GAN (SNGAN + WGAN-GP + Similarity Loss) for tabular oversampling with distributed AutoML and XAI."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "R-GAN Contributors" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Tier 1 — always installed
+dependencies = [
+    "torch>=2.0.0",
+    "numpy>=1.21.0",
+    "scikit-learn>=1.0.2",
+    "imbalanced-learn>=0.9.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/YOUR_ORG/rgan"
+Documentation = "https://YOUR_ORG.github.io/rgan"
+Repository = "https://github.com/YOUR_ORG/rgan"
+
+# ──────────────────────────────────────────────
+# Optional dependency groups (Tier 2, Tier 3)
+# ──────────────────────────────────────────────
+[project.optional-dependencies]
+automl = [
+    "ray[tune]>=2.6.0",
+    "lightgbm>=4.0.0",
+]
+explain = [
+    "shap>=0.42.0",
+    "matplotlib>=3.5.0",
+    "ray[default]>=2.6.0",
+]
+all = ["rgan[automl,explain]"]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.4.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+]
+docs = [
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+
+# ──────────────────────────────────────────────
+# Hatchling — src layout
+# ──────────────────────────────────────────────
+[tool.hatch.build.targets.wheel]
+packages = ["src/rgan"]
+
+# ──────────────────────────────────────────────
+# Ruff — single tool for linting + formatting
+# ──────────────────────────────────────────────
+[tool.ruff]
+target-version = "py310"
+line-length = 99
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "RUF", # ruff-specific
+]
+ignore = ["E501"] # line length handled by formatter
+
+[tool.ruff.lint.isort]
+known-first-party = ["rgan"]
+
+# ──────────────────────────────────────────────
+# mypy — strict on public API
+# ──────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+packages = ["rgan"]
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = [
+    "ray.*",
+    "lightgbm.*",
+    "shap.*",
+    "imblearn.*",
+    "pycaret.*",
+]
+ignore_missing_imports = true
+
+# ──────────────────────────────────────────────
+# pytest
+# ──────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "automl: requires rgan[automl] extras",
+    "explain: requires rgan[explain] extras",
+]
