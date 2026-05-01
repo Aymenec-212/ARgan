@@ -70,7 +70,7 @@ The similarity loss encourages the generator to match the directional structure 
 ## Development
 
 ```bash
-git clone https://github.com/YOUR_ORG/rgan.git
+git clone https://github.com/Aymenec-212/rgan.git 
 cd rgan
 uv sync --extra dev
 
